@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "mecanumTeleOp", group = "TeleOp")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "mecanumTeleOpv2", group = "TeleOp")
 public class mecanumTeleOpv2 extends LinearOpMode {
 
-    Hardware robot = new Hardware(hardwareMap);
-
-    //Hardware robot = new Hardware();
+    Hardware robot = new Hardware();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -16,28 +13,25 @@ public class mecanumTeleOpv2 extends LinearOpMode {
 
         waitForStart();
         while(opModeIsActive()) {
-            if (gamepad1.left_bumper) {
-                robot.frontRight.setPower(-1);
-                robot.frontLeft.setPower(-1);
-                robot.backRight.setPower(1);
-                robot.backLeft.setPower(1);
-            }
-            else if (gamepad1.right_bumper) {
-                robot.frontRight.setPower(1);
-                robot.frontLeft.setPower(1);
-                robot.backRight.setPower(-1);
-                robot.backLeft.setPower(-1);
-            }
-            else {
-                robot.frontRight.setPower(gamepad1.left_stick_y);
-                robot.frontLeft.setPower(gamepad1.left_stick_y);
-                robot.backRight.setPower(gamepad1.right_stick_y);
-                robot.backLeft.setPower(gamepad1.right_stick_y);
-            }
+            double y = -gamepad1.left_stick_y;
+            double x = gamepad1.left_stick_x;
+            double rx = -gamepad1.right_stick_x;
 
-            robot.leftIntake.setPower(-gamepad2.left_stick_y/3);
-            robot.rightIntake.setPower(gamepad2.left_stick_y/3);
-            robot.armMotor.setPower(gamepad2.right_stick_y/2);
+            robot.frontLeft.setPower((-y + x + rx)/2);
+            robot.backLeft.setPower((-y - x + rx)/2);
+            robot.frontRight.setPower((-y - x - rx)/2);
+            robot.backRight.setPower((-y + x - rx)/2);
+
+            robot.leftIntake.setPower(gamepad2.left_stick_y/2.5);
+            robot.rightIntake.setPower(gamepad2.left_stick_y/2.5);
+            robot.armMotor.setPower(gamepad2.right_stick_y/3);
+
+//            if(gamepad2.x) {
+//                robot.carouselMotor.setPower(1);
+//            }
+//            else {
+//                robot.carouselMotor.setPower(0);
+//            }
 
             idle();
         }
