@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Hardware {
@@ -12,7 +13,7 @@ public class Hardware {
     public DcMotor leftIntake = null;
     public DcMotor rightIntake = null;
     public DcMotor armMotor = null;
-    //public DcMotor carouselMotor = null;
+    public DcMotor carouselMotor = null;
 
     //Additional variables
     HardwareMap hardwareMap = null;
@@ -31,7 +32,7 @@ public class Hardware {
         leftIntake = hardwareMap.get(DcMotor.class,"leftIntake");
         rightIntake = hardwareMap.get(DcMotor.class,"rightIntake");
         armMotor = hardwareMap.get(DcMotor.class, "armMotor");
-        //carouselMotor = hardwareMap.get(DcMotor.class, "carouselMotor");
+        carouselMotor = hardwareMap.get(DcMotor.class, "carouselMotor");
 
 
         //Set up motor direction
@@ -42,7 +43,7 @@ public class Hardware {
         leftIntake.setDirection(DcMotor.Direction.FORWARD);
         rightIntake.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setDirection(DcMotor.Direction.FORWARD);
-        //carouselMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        carouselMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
 //        //Set motor mode
 //        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -58,7 +59,7 @@ public class Hardware {
 //        leftIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        rightIntake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-          //carouselMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        carouselMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //Set zero power behavior
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -68,18 +69,9 @@ public class Hardware {
         leftIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightIntake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        //Set motors to use no power
-//        frontRight.setPower(0);
-//        frontLeft.setPower(0);
-//        backRight.setPower(0);
-//        backLeft.setPower(0);
-//        leftIntake.setPower(0);
-//        rightIntake.setPower(0);
-//        armMotor.setPower(0);
-          //carouselMotor.setPower(0);
+
     }
 }
-
