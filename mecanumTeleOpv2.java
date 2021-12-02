@@ -26,12 +26,7 @@ public class mecanumTeleOpv2 extends LinearOpMode {
             robot.rightIntake.setPower(gamepad2.left_stick_y/2.5);
             robot.armMotor.setPower(gamepad2.right_stick_y/3);
 
-//            if(gamepad2.x) {
-//                robot.carouselMotor.setPower(1);
-//            }
-//            else {
-//                robot.carouselMotor.setPower(0);
-//            }
+            robot.carouselMotor.setPower(gamepad2.left_trigger);
 
             idle();
         }
