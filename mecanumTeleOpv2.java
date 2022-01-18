@@ -18,7 +18,7 @@ public class mecanumTeleOpv2 extends LinearOpMode {
             double x = gamepad1.left_stick_x;
             double rx = -gamepad1.right_stick_x;
             
-            double servoPos = 0.0
+            double servoPos = 0.0;
 
             robot.frontLeft.setPower((-y + x + rx)/2);
             robot.backLeft.setPower((-y - x + rx)/2);
