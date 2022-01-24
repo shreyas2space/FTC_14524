@@ -1,3 +1,10 @@
+/*
+This program is a simple testing program used to test individual components of the robot
+without interrupting any other processes
+ */
+
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
