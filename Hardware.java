@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -15,7 +14,7 @@ public class Hardware {
     public DcMotor rightIntake = null;
     public DcMotor armMotor = null;
     public DcMotor carouselMotor = null;
-    public Servo armServo = null;
+//    public Servo armServo = null;
 
     //Additional variables
     HardwareMap hardwareMap = null;
@@ -35,7 +34,7 @@ public class Hardware {
         rightIntake = hardwareMap.get(DcMotor.class,"rightIntake");
         armMotor = hardwareMap.get(DcMotor.class, "armMotor");
         carouselMotor = hardwareMap.get(DcMotor.class, "carouselMotor");
-        armServo = hardwareMap.get(Servo.class, "armServo");
+//        armServo = hardwareMap.get(Servo.class, "armServo");
 
 
         //Set up motor direction
