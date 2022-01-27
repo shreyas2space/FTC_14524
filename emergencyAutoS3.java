@@ -20,7 +20,6 @@ public class emergencyAutoS3 extends LinearOpMode {
 
         Thread thread1 = new Thread() {
             public void run() {
-                robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 moveForward(1, -3000, 5.0);
             }
         };

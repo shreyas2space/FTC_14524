@@ -20,17 +20,18 @@ public class blueAutoS1 extends LinearOpMode {
 
         Thread thread1 = new Thread() {
             public void run() {
-                robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                moveArm(.1, 100, 1.0);
-                moveStrafe(1, 300, 2.0, true);
-                moveCarousel(1, 10000, 5.0);
-                moveForward(1, 3550, 5.1);
+                moveArm(0.2, 200, 1.0);
+                moveStrafe(0.6, 200, 2.0, false);
+                moveCarousel(1, -10000, 5.0);
+                moveArm(0.2, 200, 1.0);
+                moveForward(1, 3400, 5.1);
+                moveArm(0.2, 200, 1.0);
                 moveTurn(1, 1300, 5.0, true);
-                moveForward(1, 2600, 5.0);
-                moveArm(.04, 750, 2);
-                moveArm(.04,-750, 2);
-//                moveTurn(1, 250, 1.0, false);
-//                moveForward(1, -2700, 5.0);
+                moveForward(1, 2400, 3.0);
+                moveArm(.3, 450, 2.0);
+                moveArm(.3,-450, 2.0);
+                moveTurn(1, 350, 1.0, false);
+                moveForward(1, -2700, 5.0);
             }
         };
 

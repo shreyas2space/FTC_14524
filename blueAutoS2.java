@@ -19,12 +19,14 @@ public class blueAutoS2 extends LinearOpMode {
 
         Thread thread1 = new Thread() {
             public void run() {
-                moveArm(.1, 400, 1.0);
-                moveForward(1, 2700, 4.0);
-                moveArm(.4, 1200, 4);
-                moveArm(.4,-1200, 4);
-                moveForward(1, -2700, 4.0);
-                moveStrafe(1, 6000, 5.0, false);
+                moveArm(0.3, 250, 1.0);
+                moveForward(0.7, 1850, 4.0);
+                moveArm(0.3, 450, 1.0);
+                moveArm(0.3, -450, 1.0);
+                moveForward(0.7, -700, 5.0);
+                moveTurn(0.5, 1350, 3.0, false);
+                moveStrafe(0.6, 1800, 6.0, false);
+                moveForward(0.7, -4000, 7.0);
 
             }
         };
@@ -32,7 +34,7 @@ public class blueAutoS2 extends LinearOpMode {
         Thread thread2 = new Thread() {
             public void run() {
 
-                moveIntake(1, 1000000000, 22.5);
+//                moveIntake(1, 1000000000, 22.5);
             }
         };
 
@@ -132,9 +134,9 @@ public class blueAutoS2 extends LinearOpMode {
                 targetbr = robot.backRight.getCurrentPosition() + (int)distance_counts;
             }
             robot.frontLeft.setTargetPosition(targetfl);
-            robot.frontRight.setTargetPosition(targetfl);
-            robot.backLeft.setTargetPosition(targetfl);
-            robot.backRight.setTargetPosition(targetfl);
+            robot.frontRight.setTargetPosition(targetfr);
+            robot.backLeft.setTargetPosition(targetbl);
+            robot.backRight.setTargetPosition(targetbr);
 
             robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
