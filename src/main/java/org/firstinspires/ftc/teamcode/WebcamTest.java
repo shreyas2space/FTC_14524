@@ -29,15 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
+
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -58,13 +58,29 @@ import org.firstinspires.ftc.robotcore.internal.network.CallbackLooper;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.robotcore.internal.system.ContinuationSynchronizer;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+import org.tensorflow.lite.DataType;
+import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.support.common.FileUtil;
+import org.tensorflow.lite.support.common.TensorProcessor;
+import org.tensorflow.lite.support.common.ops.NormalizeOp;
+import org.tensorflow.lite.support.image.ImageProcessor;
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.image.ops.ResizeOp;
+import org.tensorflow.lite.support.label.TensorLabel;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+
 
 /**
  * This OpMode illustrates how to open a webcam and retrieve images from it. It requires a configuration
@@ -73,15 +89,16 @@ import java.util.concurrent.TimeUnit;
  * by various means (e.g.: Device File Explorer in Android Studio; plugging the device into a PC and
  * using Media Transfer; ADB; etc)
  */
-@TeleOp(name="WebcamTest", group ="Tests")
-@Disabled
+@Autonomous(name="WebcamTest", group ="Tests")
 public class WebcamTest extends LinearOpMode {
 
     //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
 
-    Hardware robot = new Hardware();
+//    Hardware robot = new Hardware();
+
+    private static final int debugLevel = 3;
 
     private static final String TAG = "Webcam Sample";
 
@@ -113,12 +130,12 @@ public class WebcamTest extends LinearOpMode {
     //----------------------------------------------------------------------------------------------
 
     @Override public void runOpMode() {
-        robot.initialize(hardwareMap);
+//        robot.initialize(hardwareMap);
 
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
         cameraManager = ClassFactory.getInstance().getCameraManager();
-        cameraName = robot.webcam;
+        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");;
 
         initializeFrameQueue(2);
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
@@ -138,6 +155,7 @@ public class WebcamTest extends LinearOpMode {
 
             boolean buttonPressSeen = false;
             boolean captureWhenAvailable = false;
+            dprint("attempting to capture frame", 1);
             while (opModeIsActive()) {
 
                 boolean buttonIsPressed = gamepad1.a;
@@ -151,11 +169,17 @@ public class WebcamTest extends LinearOpMode {
                     if (bmp != null) {
                         captureWhenAvailable = false;
                         onNewFrame(bmp);
+                        break;
                     }
                 }
 
                 telemetry.update();
             }
+
+
+            while (!isStopRequested()) {telemetry.update();}
+
+
         } finally {
             closeCamera();
         }
@@ -163,7 +187,107 @@ public class WebcamTest extends LinearOpMode {
 
     /** Do something with the frame */
     private void onNewFrame(Bitmap frame) {
-        dprint("Frame Recieved");
+        dprint("Frame Recieved",2);
+        dprint("Bitmap Width" + frame.getWidth(), 2);
+
+        Map<String, Float> floatMap = null;
+
+        ImageProcessor imageProcessor =
+                new ImageProcessor.Builder()
+                        .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
+                        .build();
+
+        TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
+
+
+        tensorImage.load(frame);
+        tensorImage = imageProcessor.process(tensorImage);
+
+        TensorBuffer probabilityBuffer =
+                TensorBuffer.createFixedSize(new int[]{1, 3}, DataType.FLOAT32);
+
+        dprint("Tensor Width"+tensorImage.getWidth(),2);
+
+
+
+        final String ASSOCIATED_AXIS_LABELS = "labels.txt";
+        List<String> associatedAxisLabels = null;
+
+
+
+
+        // Initialise the model
+
+        try{
+//            print("attempting to read model",2);
+//            MappedByteBuffer tfliteModel
+//                    = FileUtil.loadMappedFile(hardwareMap.appContext,
+//                    "model_unquant.tflite");
+//            dprint("translating model into interpreter", 2);
+//            InterpreterApi tflite = new InterpreterFactory().create(
+//                    tfliteModel, new InterpreterApi.Options());
+//            dprint("trying buffer",3);
+            dprint("attempting to read model",2);
+            MappedByteBuffer model = FileUtil.loadMappedFile(hardwareMap.appContext, "model_unquant.tflite");
+            dprint("translating model into interpreter", 2);
+            Interpreter tflite = new Interpreter(model);
+
+
+            if(null != tflite) {
+                dprint("Attempting inference", 1);
+                tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
+                dprint("Inference complete", 1);
+                dprint("vikdbg19"+probabilityBuffer.getFloatArray().length,2);
+                dprint("vikdbg20"+probabilityBuffer.getFloatArray()[0], 2);
+            }
+
+            try {
+                dprint("Reading Labels", 2);
+                associatedAxisLabels = FileUtil.loadLabels(hardwareMap.appContext, ASSOCIATED_AXIS_LABELS);
+                dprint("Labels read", 2);
+
+//                dprint(associatedAxisLabels, 2);
+
+            } catch (IOException e) {
+                dprint("Error reading label file", 2);
+            }
+
+            // Post-processor which dequantize the result
+            dprint("dequantizing result", 2);
+            TensorProcessor probabilityProcessor =
+                    new TensorProcessor.Builder().add(new NormalizeOp(0, 255)).build();
+
+
+
+            if (null != associatedAxisLabels) {
+                dprint("assigning labels", 3);
+                // Map of labels and their corresponding probability
+                try {
+                    TensorLabel labels = new TensorLabel(associatedAxisLabels,
+                            probabilityProcessor.process(probabilityBuffer));
+
+                    dprint("creating map", 3);
+                    // Create a map to access the result based on label
+                    floatMap = labels.getMapWithFloatValue();
+
+
+                } catch (IllegalArgumentException e) {
+                    dprint("debug22"+String.valueOf(e),2);
+                }
+
+
+            }
+        } catch (IOException e){
+            error("Error reading model");
+        }
+
+        String key = Collections.max(floatMap.entrySet(), Map.Entry.comparingByValue()).getKey();
+        dprint(key, 2);
+
+// Running inference
+
+
+
         frame.recycle(); // not strictly necessary, but helpful
     }
 
@@ -311,8 +435,10 @@ public class WebcamTest extends LinearOpMode {
         }
     }
 
-    private void dprint(String msg) {
-        telemetry.log().add(msg);
-        telemetry.update();
+    private void dprint(String msg, int level) {
+        if (level <= debugLevel) {
+            telemetry.log().add(String.valueOf(msg));
+            telemetry.update();
+        }
     }
 }
